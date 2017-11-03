@@ -14,12 +14,24 @@ import matplotlib.pyplot as plt
 
 #%% longitud 
 def distanciaPuntoAPunto(lat1, lat2, long1, long2):
+    """
+    Calcula la distancia entre el punto de incidencia y el punto de la estacion
+    param: lat1: latitud del punto de incidencia
+    param: lat2: latitud de la estacion
+    param: long1: longitud del punto de incidencia
+    param: long2: longitud de la estacion
+    """
     dX = (lat2 - lat1) ** 2
     dY = (long2 - long1) ** 2
     return math.sqrt(dX + dY)
 
 #%% generate punto de rocio
 def puntoDeRocio(hr, t):
+    """
+    Calcula el punto de rocio
+    param: hr: humedad relativa
+    param: t: temperatura ambiente 
+    """
     pr = (hr / 100.0)**(1/8.0) * (112 + 0.9 * t) + (0.1 * t) - 112
     return pr
 
