@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def main():
     #%% read data stations
-    dataStations = pd.read_csv('data/db_sonora.csv')
+    dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
 
     #%% read data indicencia
     dataInc = pd.read_csv('data/incidencia_sonora.csv')
@@ -41,21 +41,21 @@ def main():
         
        
     #%% from text to data
-    tempTitle = 'resultados/db_incidencia.csv'
+    tempTitle = 'resultados/db_incidencia_wrf.csv'
     textFile = open(tempTitle, 'w')
     textFile.write(textToDataIncidencia)
     textFile.close()
 
     #%% read new data incidencia
-    dataIncidencia = pd.read_csv('resultados/db_incidencia.csv')
+    dataIncidencia = pd.read_csv('resultados/db_incidencia_wrf.csv')
 
     #%% generate punto de rocio
-    dataStations['dpoint'] = dataStations.apply(lambda x: puntoDeRocio(x['humr'], x['tmed']), axis=1)
+    dataWRF['dpoint'] = dataWRF.apply(lambda x: puntoDeRocio(x['humr'], x['tpro']), axis=1)
 
     #%% generate tmidnight
-    dataStations['tmidnight'] = dataStations['tmax'] - dataStations['tmin']
+    dataWRF['tmidnight'] = dataWRF['tmax'] - dataWRF['tmin']
 
-    #%% dataStations to np arrays
+    #%% dataWRF to np arrays
     latInc = np.array(dataIncidencia['lat'])
     longInc = np.array(dataIncidencia['long'])
     problemInc = np.array(dataIncidencia['problem'])
@@ -68,7 +68,7 @@ def main():
     indexInc = np.array(dataIncidencia.index)
 
     #%% create text for data
-    textToData = "lat,long,problem,incidencia,anio,mes,dia,ciclo,prec,tmax,tmin,tmed,velvmax,velv,dirvvmax,dirv,radg,humr,et,dpoint,tmidnight,condiciones,tipo\n"
+    textToData = "lat,long,problem,incidencia,anio,mes,dia,ciclo,prec,tmax,tmin,tpro,velv,dirv,humr,dpoint,tmidnight,condiciones,tipo\n"
 
     #%% loop
     for i in range(len(latInc)):
@@ -81,34 +81,30 @@ def main():
         ciclo = cicloInc[i]
         problema = problemInc[i]
         tipo = tipoInc[i]
-        dataTemp = dataStations.loc[(dataStations['anio'] == anio) & (dataStations['mes'] == mes) & (dataStations['dia'] == dia)]
+        dataTemp = dataWRF.loc[(dataWRF['anio'] == anio) & (dataWRF['mes'] == mes) & (dataWRF['dia'] == dia)]
         dataTemp['distancia'] = dataTemp.apply(lambda x: distanciaPuntoAPunto(x['latitud'], latitud, x['longitud'], longitud), axis=1)
         distanciaMinima = dataTemp['distancia'].min()
         dataTemp = dataTemp.loc[dataTemp['distancia'] == distanciaMinima]
         prec = np.array(dataTemp['prec'])
         tmax = np.array(dataTemp['tmax'])
         tmin = np.array(dataTemp['tmin'])
-        tmed = np.array(dataTemp['tmed'])
-        velvmax = np.array(dataTemp['velvmax'])
+        tmed = np.array(dataTemp['tpro'])
         velv = np.array(dataTemp['velv'])
-        dirvvmax = np.array(dataTemp['dirvvmax'])
         dirv = np.array(dataTemp['dirv'])
-        radg = np.array(dataTemp['radg'])
         humr = np.array(dataTemp['humr'])
-        et = np.array(dataTemp['et'])
         dpoint = np.array(dataTemp['dpoint'])
         tmidnight = np.array(dataTemp['tmidnight'])
         condicion = validarCondicion(tmed, tmidnight, dpoint)  
-        textToData += "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(latitud, longitud, problema, incidencia, anio, mes, dia, ciclo, prec[0], tmax[0], tmin[0], tmed[0], velvmax[0], velv[0], dirvvmax[0], dirv[0],radg[0],humr[0],et[0], dpoint[0], tmidnight[0], condicion, tipo)
+        textToData += "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(latitud, longitud, problema, incidencia, anio, mes, dia, ciclo, prec[0], tmax[0], tmin[0], tmed[0], velv[0], dirv[0],humr[0], dpoint[0], tmidnight[0], condicion, tipo)
 
     #%% from text to data
-    tempTitle = 'resultados/db_join_estaciones_10_25.csv'
+    tempTitle = 'resultados/db_join_wrf_10_25.csv'
     textFile = open(tempTitle, 'w')
     textFile.write(textToData)
     textFile.close()
 
     #%% read data
-    data = pd.read_csv('resultados/db_join_estaciones_10_25.csv')
+    data = pd.read_csv('resultados/db_join_wrf_10_25.csv')
 
     #%% generar indice Presencia
     data['indicePresencia'] = data['condiciones'].shift(-1) + data['condiciones'].shift(-2) + data['condiciones'].shift(-3) + data['condiciones'].shift(-4)
@@ -120,7 +116,7 @@ def main():
     data['porcentajePresencia'] = data['indicePresencia'] * 0.25
 
     #%% guardar info
-    data.to_csv('resultados/db_join_estaciones_10_25_pp.csv', index=False)
+    data.to_csv('resultados/db_join_wrf_10_25_pp.csv', index=False)
 
 #%% Longitud del punto 
 def distanciaPuntoAPunto(lat1, lat2, long1, long2):
