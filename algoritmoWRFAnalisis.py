@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def main():
     #%% read data stations
-dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
+    dataStations = pd.read_csv('data/db_sonora.csv')
 
     #%% read data indicencia
     dataInc = pd.read_csv('data/incidencia_sonora.csv')
@@ -34,10 +34,10 @@ dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
         mes = getattr(row,'mes')
         dia = getattr(row,'dia')
         arrayFechasProcesamiento = generacionDeFechas(anio, mes, dia)
+        textToDataIncidencia += "{},{},{},{},{},{},{},{},N\n".format(latProcesamiento, longProcesamiento, problemProcesamiento, incidenciaProcesamiento, anio, mes, dia, cicloProcesamiento)
         for i in arrayFechasProcesamiento:
             tanio, tmes, tdia = i.split("-")
             textToDataIncidencia += "{},{},{},0.0,{},{},{},{},G\n".format(latProcesamiento, longProcesamiento, problemProcesamiento, tanio, tmes, tdia, cicloProcesamiento)
-        textToDataIncidencia += "{},{},{},{},{},{},{},{},N\n".format(latProcesamiento, longProcesamiento, problemProcesamiento, incidenciaProcesamiento, anio, mes, dia, cicloProcesamiento)
         
        
     #%% from text to data
@@ -106,6 +106,21 @@ dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
     textFile = open(tempTitle, 'w')
     textFile.write(textToData)
     textFile.close()
+
+    #%% read data
+    data = pd.read_csv('resultados/db_join_estaciones_10_25.csv')
+
+    #%% generar indice Presencia
+    data['indicePresencia'] = data['condiciones'].shift(-1) + data['condiciones'].shift(-2) + data['condiciones'].shift(-3) + data['condiciones'].shift(-4)
+    
+    #%% eliminar tados generados
+    data = data.loc[data['tipo']== 'N']
+
+    #%% generar porcentaje de presencia
+    data['porcentajePresencia'] = data['indicePresencia'] * 0.25
+
+    #%% guardar info
+    data.to_csv('resultados/db_join_estaciones_10_25_pp.csv', index=False)
 
 #%% Longitud del punto 
 def distanciaPuntoAPunto(lat1, lat2, long1, long2):
