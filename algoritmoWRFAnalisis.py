@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def main():
     #%% read data stations
-    dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
+    dataWRF = pd.read_csv('data/db_sonora_wrf1.csv')
 
     #%% read data indicencia
     dataInc = pd.read_csv('data/incidencia_sonora.csv')
