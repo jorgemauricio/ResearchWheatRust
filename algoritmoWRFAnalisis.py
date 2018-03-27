@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def main():
     #%% read data stations
-    dataWRF = pd.read_csv('data/db_sonora_wrf1.csv')
+    dataWRF = pd.read_csv('data/db_sonora_wrf.csv')
 
     #%% read data indicencia
     dataInc = pd.read_csv('data/incidencia_sonora.csv')
@@ -116,7 +116,7 @@ def main():
     data['porcentajePresencia'] = data['indicePresencia'] * 0.25
 
     #%% guardar info
-    data.to_csv('resultados/db_join_wrf_10_25_pp.csv', index=False)
+    data.to_csv('resultados/db_join_wrf_tpro_10_25_tmid_10_20.csv', index=False)
 
 #%% Longitud del punto 
 def distanciaPuntoAPunto(lat1, lat2, long1, long2):
@@ -179,7 +179,7 @@ def validarCondicion(tempPro, tempMid, dwpoint):
     param: tempMid: temperatura nocturna
     param: dwpoint: punto de rocio
     """
-    if (tempPro >= 10 and tempPro <= 25 ) and (tempMid >= 15 and tempMid <= 20) and dwpoint >= 5:
+    if (tempPro >= 10 and tempPro <= 25 ) and (tempMid >= 10 and tempMid <= 20) and dwpoint >= 5:
         return 1
     else:
         return 0
